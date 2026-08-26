@@ -82,140 +82,187 @@
       <div class="metric-sub"><span id="sunrise">--:--</span> sunrise • <span id="sunset">--:--</span> sunset</div>
     </div>
 
-   <div class="card">
-  <div class="card-label">Moon Report</div>
-  <div style="display: flex; align-items: center; justify-content: space-between;">
-    <div>
-      <div class="metric-primary" id="moon-phase" style="font-size: 28px; text-transform: capitalize;">--</div>
-      <div class="metric-sub" id="moon-illum">--% illuminated</div>
+    <div class="card">
+      <div class="card-label">Moon Report</div>
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div class="metric-primary" id="moon-phase" style="font-size: 28px; text-transform: capitalize;">--</div>
+          <div class="metric-sub" id="moon-illum">--% illuminated</div>
+        </div>
+        <!-- Canvas for the Moon Phase Drawing -->
+        <canvas id="moonCanvas" width="70" height="70"></canvas>
+      </div>
     </div>
-    <!-- Canvas for the Moon Phase Drawing -->
-    <canvas id="moonCanvas" width="70" height="70"></canvas>
   </div>
-</div>
 
   <script>
-const SHEET_ID = '1WVrak9Kjjis9tDC70r_sYcIGZ5o2P5Nf0b9FrCbgPbw';
-  const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+    const SHEET_ID = '1WVrak9Kjjis9tDC70r_sYcIGZ5o2P5Nf0b9FrCbgPbw';
+    const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-  // Helper to format values whether they come as strings, numbers, or Date() strings
-  function cleanValue(cell, type) {
-    if (!cell || cell.v === null || cell.v === undefined) return '--';
-    
-    // If Google Sheets returns formatted text, prefer it
-    if (cell.f) {
-      if (type === 'percent') return cell.f.includes('%') ? cell.f : `${cell.f}%`;
-      return cell.f;
-    }
-
-    let val = cell.v.toString();
-
-    // Fix Google Date(...) strings if Plain Text formatting wasn't applied
-    if (val.startsWith('Date(')) {
-      const parts = val.replace('Date(', '').replace(')', '').split(',').map(Number);
-      if (type === 'date') {
-        return `${parts[0]}-${String(parts[1] + 1).padStart(2, '0')}-${String(parts[2]).padStart(2, '0')}`;
-      }
-      if (type === 'time') {
-        let hrs = parts[3];
-        const mins = String(parts[4]).padStart(2, '0');
-        const ampm = hrs >= 12 ? 'PM' : 'AM';
-        hrs = hrs % 12 || 12;
-        return `${hrs}:${mins} ${ampm}`;
-      }
-    }
-
-    if (type === 'percent') {
-      if (val.includes('%')) return val;
-      const num = parseFloat(val);
-      return !isNaN(num) ? `${Math.round(num > 1 ? num : num * 100)}%` : val;
-    }
-
-    return val;
-  }
-
-  function drawSkyLog(sunriseStr, sunsetStr) {
-    const canvas = document.getElementById('skyCanvas');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const radius = 100;
-
-    ctx.clearRect(0, 0, width, height);
-
-    // 1. Draw dashed outer orbit ring
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#D8D3C8';
-    ctx.setLineDash([2, 4]);
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // 2. Parse Sunrise / Sunset Times
-    const parseTime = (timeStr) => {
-      const d = new Date();
-      if (!timeStr || timeStr === '--') return d;
+    // Helper to format values whether they come as strings, numbers, or Date() strings
+    function cleanValue(cell, type) {
+      if (!cell || cell.v === null || cell.v === undefined) return '--';
       
-      const parts = timeStr.trim().split(' ');
-      const modifier = parts[1];
-      const timeParts = parts[0].split(':').map(Number);
-      let hours = timeParts[0];
-      let minutes = timeParts[1] || 0;
+      if (cell.f) {
+        if (type === 'percent') return cell.f.includes('%') ? cell.f : `${cell.f}%`;
+        return cell.f;
+      }
 
-      if (modifier === 'PM' && hours < 12) hours += 12;
-      if (modifier === 'AM' && hours === 12) hours = 0;
-      
-      d.setHours(hours, minutes, 0, 0);
-      return d;
-    };
+      let val = cell.v.toString();
 
-    const now = new Date();
-    const sunrise = parseTime(sunriseStr);
-    const sunset = parseTime(sunsetStr);
-    
-    let progress = 0;
-    if (now > sunrise && now < sunset) {
-      progress = (now - sunrise) / (sunset - sunrise);
-    } else if (now >= sunset) {
-      progress = 1;
+      if (val.startsWith('Date(')) {
+        const parts = val.replace('Date(', '').replace(')', '').split(',').map(Number);
+        if (type === 'date') {
+          return `${parts[0]}-${String(parts[1] + 1).padStart(2, '0')}-${String(parts[2]).padStart(2, '0')}`;
+        }
+        if (type === 'time') {
+          let hrs = parts[3];
+          const mins = String(parts[4]).padStart(2, '0');
+          const ampm = hrs >= 12 ? 'PM' : 'AM';
+          hrs = hrs % 12 || 12;
+          return `${hrs}:${mins} ${ampm}`;
+        }
+      }
+
+      if (type === 'percent') {
+        if (val.includes('%')) return val;
+        const num = parseFloat(val);
+        return !isNaN(num) ? `${Math.round(num > 1 ? num : num * 100)}%` : val;
+      }
+
+      return val;
     }
 
-    const angle = Math.PI * (0.75 + progress * 1.5);
+    // 1. Orbital Sun Visualizer Function
+    function drawSkyLog(sunriseStr, sunsetStr) {
+      const canvas = document.getElementById('skyCanvas');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radius = 100;
 
-    // 3. Draw central glow / Sun disc
-    ctx.beginPath();
-    ctx.arc(centerX, centerY - 10, 48, 0, 2 * Math.PI);
-    ctx.fillStyle = 'rgba(244, 189, 104, 0.25)';
-    ctx.fill();
+      ctx.clearRect(0, 0, width, height);
 
-    ctx.beginPath();
-    ctx.arc(centerX, centerY - 10, 38, 0, 2 * Math.PI);
-    ctx.fillStyle = '#F4BD68';
-    ctx.fill();
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.strokeStyle = '#D8D3C8';
+      ctx.setLineDash([2, 4]);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.setLineDash([]);
 
-    // 4. Draw current Sun position indicator dot
-    const sunX = centerX + radius * Math.cos(angle);
-    const sunY = centerY + radius * Math.sin(angle);
+      const parseTime = (timeStr) => {
+        const d = new Date();
+        if (!timeStr || timeStr === '--') return d;
+        
+        const parts = timeStr.trim().split(' ');
+        const modifier = parts[1];
+        const timeParts = parts[0].split(':').map(Number);
+        let hours = timeParts[0];
+        let minutes = timeParts[1] || 0;
 
-    ctx.beginPath();
-    ctx.arc(sunX, sunY, 5, 0, 2 * Math.PI);
-    ctx.fillStyle = '#E25B36';
-    ctx.fill();
+        if (modifier === 'PM' && hours < 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
+        
+        d.setHours(hours, minutes, 0, 0);
+        return d;
+      };
 
-    // 5. Center Label Text
-    ctx.font = '10px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#111111';
-    ctx.textAlign = 'center';
-    ctx.fillText('ALASKA', centerX, centerY + 65);
-    ctx.fillText('SKY LOG', centerX, centerY + 78);
-  }
+      const now = new Date();
+      const sunrise = parseTime(sunriseStr);
+      const sunset = parseTime(sunsetStr);
+      
+      let progress = 0;
+      if (now > sunrise && now < sunset) {
+        progress = (now - sunrise) / (sunset - sunrise);
+      } else if (now >= sunset) {
+        progress = 1;
+      }
 
-  fetch(URL)
+      const angle = Math.PI * (0.75 + progress * 1.5);
+
+      ctx.beginPath();
+      ctx.arc(centerX, centerY - 10, 48, 0, 2 * Math.PI);
+      ctx.fillStyle = 'rgba(244, 189, 104, 0.25)';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(centerX, centerY - 10, 38, 0, 2 * Math.PI);
+      ctx.fillStyle = '#F4BD68';
+      ctx.fill();
+
+      const sunX = centerX + radius * Math.cos(angle);
+      const sunY = centerY + radius * Math.sin(angle);
+
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 5, 0, 2 * Math.PI);
+      ctx.fillStyle = '#E25B36';
+      ctx.fill();
+
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#111111';
+      ctx.textAlign = 'center';
+      ctx.fillText('ALASKA', centerX, centerY + 65);
+      ctx.fillText('SKY LOG', centerX, centerY + 78);
+    }
+
+    // 2. Moon Phase Renderer Function
+    function drawMoonPhase(phaseName, illuminationStr) {
+      const canvas = document.getElementById('moonCanvas');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const cx = size / 2;
+      const cy = size / 2;
+      const r = size / 2 - 4;
+
+      let illum = parseFloat(illuminationStr) / 100;
+      if (isNaN(illum)) illum = 0.5;
+
+      const isWaxing = phaseName.toLowerCase().includes('waxing') || phaseName.toLowerCase().includes('first');
+      const isFull = phaseName.toLowerCase().includes('full');
+      const isNew = phaseName.toLowerCase().includes('new');
+
+      ctx.clearRect(0, 0, size, size);
+
+      // Base unlit moon surface
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+      ctx.fillStyle = '#222222';
+      ctx.fill();
+
+      if (isFull || illum >= 0.99) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+        ctx.fillStyle = '#F4BD68';
+        ctx.fill();
+        return;
+      }
+
+      if (isNew || illum <= 0.01) return;
+
+      const xOffset = r * (2 * illum - 1); 
+
+      ctx.beginPath();
+      if (isWaxing) {
+        ctx.arc(cx, cy, r, -Math.PI / 2, Math.PI / 2, false);
+      } else {
+        ctx.arc(cx, cy, r, Math.PI / 2, -Math.PI / 2, false);
+      }
+
+      ctx.ellipse(cx, cy, Math.abs(xOffset), r, 0, Math.PI / 2, -Math.PI / 2, xOffset < 0 ? !isWaxing : isWaxing);
+
+      ctx.fillStyle = '#F4BD68';
+      ctx.fill();
+    }
+
+    // 3. Fetch Data from Google Sheets
+    fetch(URL)
       .then(res => res.text())
       .then(data => {
         const json = JSON.parse(data.substring(47, data.length - 2));
@@ -243,10 +290,8 @@ const SHEET_ID = '1WVrak9Kjjis9tDC70r_sYcIGZ5o2P5Nf0b9FrCbgPbw';
         document.getElementById('moon-phase').innerText = moonPhase;
         document.getElementById('moon-illum').innerText = `${moonIllum} illuminated`;
 
-        // Render the orbital sun canvas visualizer
+        // Render both canvas graphics
         drawSkyLog(sunrise, sunset);
-
-        // 
         drawMoonPhase(moonPhase, moonIllum);
       })
       .catch(err => console.error("Sheet Fetch Error:", err));
