@@ -91,101 +91,112 @@
 
   <script>
     const SHEET_ID = '1WVrak9Kjjis9tDC70r_sYcIGZ5o2P5Nf0b9FrCbgPbw';
-    const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+  const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-    function drawSkyLog(sunriseStr, sunsetStr) {
-      const canvas = document.getElementById('skyCanvas');
-      if (!canvas) return;
+  function drawSkyLog(sunriseStr, sunsetStr) {
+    const canvas = document.getElementById('skyCanvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = 100;
+
+    ctx.clearRect(0, 0, width, height);
+
+    // 1. Draw dashed outer orbit ring
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#D8D3C8';
+    ctx.setLineDash([2, 4]);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 2. Parse Sunrise / Sunset (Handles "5:45 AM" or "5:45:12 AM")
+    const parseTime = (timeStr) => {
+      const d = new Date();
+      if (!timeStr) return d;
+      const parts = timeStr.trim().split(' ');
+      const modifier = parts[1];
+      const timeParts = parts[0].split(':').map(Number);
+      let hours = timeParts[0];
+      let minutes = timeParts[1] || 0;
+
+      if (modifier === 'PM' && hours < 12) hours += 12;
+      if (modifier === 'AM' && hours === 12) hours = 0;
       
-      const ctx = canvas.getContext('2d');
-      const width = canvas.width;
-      const height = canvas.height;
-      const centerX = width / 2;
-      const centerY = height / 2;
-      const radius = 100;
+      d.setHours(hours, minutes, 0, 0);
+      return d;
+    };
 
-      ctx.clearRect(0, 0, width, height);
-
-      // 1. Draw dashed outer orbit ring
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-      ctx.strokeStyle = '#D8D3C8';
-      ctx.setLineDash([2, 4]);
-      ctx.lineWidth = 1;
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // 2. Calculate Sun Angle based on current time vs. daylight window
-      const now = new Date();
-      const parseTime = (timeStr) => {
-        const [time, modifier] = timeStr.split(' ');
-        let [hours, minutes] = time.split(':').map(Number);
-        if (modifier === 'PM' && hours < 12) hours += 12;
-        if (modifier === 'AM' && hours === 12) hours = 0;
-        const d = new Date();
-        d.setHours(hours, minutes, 0, 0);
-        return d;
-      };
-
-      const sunrise = parseTime(sunriseStr);
-      const sunset = parseTime(sunsetStr);
-      
-      let progress = 0;
-      if (now > sunrise && now < sunset) {
-        progress = (now - sunrise) / (sunset - sunrise);
-      } else if (now >= sunset) {
-        progress = 1;
-      }
-
-      const angle = Math.PI * (0.75 + progress * 1.5);
-
-      // 3. Draw central glow / Sun disc
-      ctx.beginPath();
-      ctx.arc(centerX, centerY - 10, 48, 0, 2 * Math.PI);
-      ctx.fillStyle = 'rgba(244, 189, 104, 0.25)';
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(centerX, centerY - 10, 38, 0, 2 * Math.PI);
-      ctx.fillStyle = '#F4BD68';
-      ctx.fill();
-
-      // 4. Draw current Sun position indicator dot on orbit line
-      const sunX = centerX + radius * Math.cos(angle);
-      const sunY = centerY + radius * Math.sin(angle);
-
-      ctx.beginPath();
-      ctx.arc(sunX, sunY, 5, 0, 2 * Math.PI);
-      ctx.fillStyle = '#E25B36';
-      ctx.fill();
-
-      // 5. Center Label Text
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillStyle = '#111111';
-      ctx.textAlign = 'center';
-      ctx.fillText('ALASKA', centerX, centerY + 65);
-      ctx.fillText('SKY LOG', centerX, centerY + 78);
+    const now = new Date();
+    const sunrise = parseTime(sunriseStr);
+    const sunset = parseTime(sunsetStr);
+    
+    let progress = 0;
+    if (now > sunrise && now < sunset) {
+      progress = (now - sunrise) / (sunset - sunrise);
+    } else if (now >= sunset) {
+      progress = 1;
     }
 
-    fetch(URL)
-      .then(res => res.text())
-      .then(data => {
-        const json = JSON.parse(data.substr(47).slice(0, -2));
-        const rows = json.table.rows;
-        const latest = rows[rows.length - 1].c;
+    const angle = Math.PI * (0.75 + progress * 1.5);
 
-        document.getElementById('update-date').innerText = `UPDATED ${latest[0].v}`;
-        document.getElementById('temp-range').innerHTML = `${latest[1].v}° <span style="color:var(--text-sub); font-weight:400;">/ ${latest[2].v}°</span>`;
-        document.getElementById('condition').innerText = latest[3].v;
-        document.getElementById('sunrise').innerText = latest[4].v;
-        document.getElementById('sunset').innerText = latest[5].v;
-        document.getElementById('daylight').innerText = latest[6].v;
-        document.getElementById('moon-phase').innerText = latest[7].v;
-        document.getElementById('moon-illum').innerText = `${latest[8].v} illuminated`;
+    // 3. Draw central glow / Sun disc
+    ctx.beginPath();
+    ctx.arc(centerX, centerY - 10, 48, 0, 2 * Math.PI);
+    ctx.fillStyle = 'rgba(244, 189, 104, 0.25)';
+    ctx.fill();
 
-        // Draw orbital visualizer once sunrise and sunset times arrive
-        drawSkyLog(latest[4].v, latest[5].v);
-      });
+    ctx.beginPath();
+    ctx.arc(centerX, centerY - 10, 38, 0, 2 * Math.PI);
+    ctx.fillStyle = '#F4BD68';
+    ctx.fill();
+
+    // 4. Draw current Sun position indicator dot
+    const sunX = centerX + radius * Math.cos(angle);
+    const sunY = centerY + radius * Math.sin(angle);
+
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, 5, 0, 2 * Math.PI);
+    ctx.fillStyle = '#E25B36';
+    ctx.fill();
+
+    // 5. Center Label Text
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#111111';
+    ctx.textAlign = 'center';
+    ctx.fillText('ALASKA', centerX, centerY + 65);
+    ctx.fillText('SKY LOG', centerX, centerY + 78);
+  }
+
+  fetch(URL)
+    .then(res => res.text())
+    .then(data => {
+      const json = JSON.parse(data.substring(47, data.length - 2));
+      const rows = json.table.rows;
+      if (!rows || rows.length === 0) return;
+
+      const latest = rows[rows.length - 1].c;
+
+      // Extract raw values safely
+      const val = (idx) => (latest[idx] && latest[idx].v !== null) ? latest[idx].v : '--';
+
+      document.getElementById('update-date').innerText = `UPDATED ${val(0)}`;
+      document.getElementById('temp-range').innerHTML = `${val(1)}° <span style="color:var(--text-sub); font-weight:400;">/ ${val(2)}°</span>`;
+      document.getElementById('condition').innerText = val(3);
+      document.getElementById('sunrise').innerText = val(4);
+      document.getElementById('sunset').innerText = val(5);
+      document.getElementById('daylight').innerText = val(6);
+      document.getElementById('moon-phase').innerText = val(7);
+      document.getElementById('moon-illum').innerText = val(8).toString().includes('%') ? val(8) : `${val(8)} illuminated`;
+
+      drawSkyLog(val(4), val(5));
+    })
+    .catch(err => console.error("Sheet Fetch Error:", err));
   </script>
 </body>
 </html>
