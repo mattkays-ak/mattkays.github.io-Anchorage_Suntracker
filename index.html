@@ -82,12 +82,17 @@
       <div class="metric-sub"><span id="sunrise">--:--</span> sunrise • <span id="sunset">--:--</span> sunset</div>
     </div>
 
-    <div class="card">
-      <div class="card-label">Moon Report</div>
-      <div class="metric-primary" id="moon-phase" style="font-size: 32px; text-transform: capitalize;">--</div>
+   <div class="card">
+  <div class="card-label">Moon Report</div>
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    <div>
+      <div class="metric-primary" id="moon-phase" style="font-size: 28px; text-transform: capitalize;">--</div>
       <div class="metric-sub" id="moon-illum">--% illuminated</div>
     </div>
+    <!-- Canvas for the Moon Phase Drawing -->
+    <canvas id="moonCanvas" width="70" height="70"></canvas>
   </div>
+</div>
 
   <script>
 const SHEET_ID = '1WVrak9Kjjis9tDC70r_sYcIGZ5o2P5Nf0b9FrCbgPbw';
