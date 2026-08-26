@@ -90,8 +90,44 @@
   </div>
 
   <script>
-    const SHEET_ID = '1WVrak9Kjjis9tDC70r_sYcIGZ5o2P5Nf0b9FrCbgPbw';
+const SHEET_ID = '1WVrak9Kjjis9tDC70r_sYcIGZ5o2P5Nf0b9FrCbgPbw';
   const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+  // Helper to format values whether they come as strings, numbers, or Date() strings
+  function cleanValue(cell, type) {
+    if (!cell || cell.v === null || cell.v === undefined) return '--';
+    
+    // If Google Sheets returns formatted text, prefer it
+    if (cell.f) {
+      if (type === 'percent') return cell.f.includes('%') ? cell.f : `${cell.f}%`;
+      return cell.f;
+    }
+
+    let val = cell.v.toString();
+
+    // Fix Google Date(...) strings if Plain Text formatting wasn't applied
+    if (val.startsWith('Date(')) {
+      const parts = val.replace('Date(', '').replace(')', '').split(',').map(Number);
+      if (type === 'date') {
+        return `${parts[0]}-${String(parts[1] + 1).padStart(2, '0')}-${String(parts[2]).padStart(2, '0')}`;
+      }
+      if (type === 'time') {
+        let hrs = parts[3];
+        const mins = String(parts[4]).padStart(2, '0');
+        const ampm = hrs >= 12 ? 'PM' : 'AM';
+        hrs = hrs % 12 || 12;
+        return `${hrs}:${mins} ${ampm}`;
+      }
+    }
+
+    if (type === 'percent') {
+      if (val.includes('%')) return val;
+      const num = parseFloat(val);
+      return !isNaN(num) ? `${Math.round(num > 1 ? num : num * 100)}%` : val;
+    }
+
+    return val;
+  }
 
   function drawSkyLog(sunriseStr, sunsetStr) {
     const canvas = document.getElementById('skyCanvas');
@@ -115,10 +151,11 @@
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // 2. Parse Sunrise / Sunset (Handles "5:45 AM" or "5:45:12 AM")
+    // 2. Parse Sunrise / Sunset Times
     const parseTime = (timeStr) => {
       const d = new Date();
-      if (!timeStr) return d;
+      if (!timeStr || timeStr === '--') return d;
+      
       const parts = timeStr.trim().split(' ');
       const modifier = parts[1];
       const timeParts = parts[0].split(':').map(Number);
@@ -182,19 +219,26 @@
 
       const latest = rows[rows.length - 1].c;
 
-      // Extract raw values safely
-      const val = (idx) => (latest[idx] && latest[idx].v !== null) ? latest[idx].v : '--';
+      const updateDate = cleanValue(latest[0], 'date');
+      const highTemp = cleanValue(latest[1], 'text');
+      const lowTemp = cleanValue(latest[2], 'text');
+      const condition = cleanValue(latest[3], 'text');
+      const sunrise = cleanValue(latest[4], 'time');
+      const sunset = cleanValue(latest[5], 'time');
+      const daylight = cleanValue(latest[6], 'text');
+      const moonPhase = cleanValue(latest[7], 'text');
+      const moonIllum = cleanValue(latest[8], 'percent');
 
-      document.getElementById('update-date').innerText = `UPDATED ${val(0)}`;
-      document.getElementById('temp-range').innerHTML = `${val(1)}° <span style="color:var(--text-sub); font-weight:400;">/ ${val(2)}°</span>`;
-      document.getElementById('condition').innerText = val(3);
-      document.getElementById('sunrise').innerText = val(4);
-      document.getElementById('sunset').innerText = val(5);
-      document.getElementById('daylight').innerText = val(6);
-      document.getElementById('moon-phase').innerText = val(7);
-      document.getElementById('moon-illum').innerText = val(8).toString().includes('%') ? val(8) : `${val(8)} illuminated`;
+      document.getElementById('update-date').innerText = `UPDATED ${updateDate}`;
+      document.getElementById('temp-range').innerHTML = `${highTemp}° <span style="color:var(--text-sub); font-weight:400;">/ ${lowTemp}°</span>`;
+      document.getElementById('condition').innerText = condition;
+      document.getElementById('sunrise').innerText = sunrise;
+      document.getElementById('sunset').innerText = sunset;
+      document.getElementById('daylight').innerText = daylight;
+      document.getElementById('moon-phase').innerText = moonPhase;
+      document.getElementById('moon-illum').innerText = `${moonIllum} illuminated`;
 
-      drawSkyLog(val(4), val(5));
+      drawSkyLog(sunrise, sunset);
     })
     .catch(err => console.error("Sheet Fetch Error:", err));
   </script>
