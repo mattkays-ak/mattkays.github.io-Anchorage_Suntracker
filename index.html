@@ -216,36 +216,40 @@ const SHEET_ID = '1WVrak9Kjjis9tDC70r_sYcIGZ5o2P5Nf0b9FrCbgPbw';
   }
 
   fetch(URL)
-    .then(res => res.text())
-    .then(data => {
-      const json = JSON.parse(data.substring(47, data.length - 2));
-      const rows = json.table.rows;
-      if (!rows || rows.length === 0) return;
+      .then(res => res.text())
+      .then(data => {
+        const json = JSON.parse(data.substring(47, data.length - 2));
+        const rows = json.table.rows;
+        if (!rows || rows.length === 0) return;
 
-      const latest = rows[rows.length - 1].c;
+        const latest = rows[rows.length - 1].c;
 
-      const updateDate = cleanValue(latest[0], 'date');
-      const highTemp = cleanValue(latest[1], 'text');
-      const lowTemp = cleanValue(latest[2], 'text');
-      const condition = cleanValue(latest[3], 'text');
-      const sunrise = cleanValue(latest[4], 'time');
-      const sunset = cleanValue(latest[5], 'time');
-      const daylight = cleanValue(latest[6], 'text');
-      const moonPhase = cleanValue(latest[7], 'text');
-      const moonIllum = cleanValue(latest[8], 'percent');
+        const updateDate = cleanValue(latest[0], 'date');
+        const highTemp = cleanValue(latest[1], 'text');
+        const lowTemp = cleanValue(latest[2], 'text');
+        const condition = cleanValue(latest[3], 'text');
+        const sunrise = cleanValue(latest[4], 'time');
+        const sunset = cleanValue(latest[5], 'time');
+        const daylight = cleanValue(latest[6], 'text');
+        const moonPhase = cleanValue(latest[7], 'text');
+        const moonIllum = cleanValue(latest[8], 'percent');
 
-      document.getElementById('update-date').innerText = `UPDATED ${updateDate}`;
-      document.getElementById('temp-range').innerHTML = `${highTemp}° <span style="color:var(--text-sub); font-weight:400;">/ ${lowTemp}°</span>`;
-      document.getElementById('condition').innerText = condition;
-      document.getElementById('sunrise').innerText = sunrise;
-      document.getElementById('sunset').innerText = sunset;
-      document.getElementById('daylight').innerText = daylight;
-      document.getElementById('moon-phase').innerText = moonPhase;
-      document.getElementById('moon-illum').innerText = `${moonIllum} illuminated`;
+        document.getElementById('update-date').innerText = `UPDATED ${updateDate}`;
+        document.getElementById('temp-range').innerHTML = `${highTemp}° <span style="color:var(--text-sub); font-weight:400;">/ ${lowTemp}°</span>`;
+        document.getElementById('condition').innerText = condition;
+        document.getElementById('sunrise').innerText = sunrise;
+        document.getElementById('sunset').innerText = sunset;
+        document.getElementById('daylight').innerText = daylight;
+        document.getElementById('moon-phase').innerText = moonPhase;
+        document.getElementById('moon-illum').innerText = `${moonIllum} illuminated`;
 
-      drawSkyLog(sunrise, sunset);
-    })
-    .catch(err => console.error("Sheet Fetch Error:", err));
+        // Render the orbital sun canvas visualizer
+        drawSkyLog(sunrise, sunset);
+
+        // 
+        drawMoonPhase(moonPhase, moonIllum);
+      })
+      .catch(err => console.error("Sheet Fetch Error:", err));
   </script>
 </body>
 </html>
