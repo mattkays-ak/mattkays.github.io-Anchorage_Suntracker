@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "timestamp": "2026-09-09T18:44:18.672541+00:00",
+    "date": "2026-09-09",
+    "sunrise": "2026-09-09T07:12",
+    "sunset": "2026-09-09T20:40",
+    "daylight_hours": 13.48,
+    "current_temp_f": 57.7,
+    "cloud_cover_pct": 59,
+    "weather_code": 2
+  }
+]
