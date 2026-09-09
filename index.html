@@ -359,26 +359,25 @@ fetch('./data.json')
     if (!data || data.length === 0) return;
     const latest = data[data.length - 1];
 
-    // Forecast Range
+    // Forecast Range Box
     const rangeElem = document.getElementById('forecast-range');
-    if (rangeElem) rangeElem.innerHTML = `${latest.high} / ${latest.low}`;
+    if (rangeElem) rangeElem.innerText = `${latest.high} / ${latest.low}`;
 
-    // Daylight & Sun Times
+    // Daylight Box
     const daylightElem = document.getElementById('daylight-hours');
     if (daylightElem) daylightElem.innerText = latest.daylight;
 
     const sunTimesElem = document.getElementById('sun-times');
     if (sunTimesElem) sunTimesElem.innerText = `${latest.sunrise} sunrise • ${latest.sunset} sunset`;
 
-    // Weather Report
+    // Moon Report Box
     const moonPhaseElem = document.getElementById('moon-phase');
-    if (moonPhaseElem) moonPhaseElem.innerText = latest.condition;
+    if (moonPhaseElem) moonPhaseElem.innerText = latest.moon_phase;
 
     const moonIllumElem = document.getElementById('moon-illum');
-    if (moonIllumElem) moonIllumElem.innerText = latest.cloud_cover;
+    if (moonIllumElem) moonIllumElem.innerText = latest.moon_illumination;
 
-    // Archive & Canvas
-    if (typeof drawSkyLog === 'function') drawSkyLog(latest.sunrise, latest.sunset);
+    // Render Table Archive
     if (typeof populateArchive === 'function') populateArchive(data);
   })
   .catch(err => console.error("Data Fetch Error:", err));
