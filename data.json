@@ -1,13 +1,14 @@
 [
   {
-    "timestamp": "2026-09-09T19:20:18.707026+00:00",
+    "timestamp": "2026-09-09T20:14:43.462275+00:00",
     "date": "2026-09-09",
     "high": "65\u00b0",
     "low": "48\u00b0",
-    "condition": "Partly cloudy",
+    "condition": "Overcast",
     "sunrise": "7:12 AM",
     "sunset": "8:40 PM",
     "daylight": "13h 28m",
+    "sun_peak": "33.4\u00b0",
     "moon_phase": "Waning Crescent",
     "moon_illumination": "7% illuminated"
   }
