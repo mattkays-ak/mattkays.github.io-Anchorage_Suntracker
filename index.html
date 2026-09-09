@@ -508,12 +508,19 @@ setInterval(fetchLiveTemperature, 15 * 60 * 1000);
         const updateElem = document.getElementById('update-date');
         if (updateElem) updateElem.innerText = `UPDATED ${latest.date}`;
 
+ ;
         // Forecast Range Box
         const rangeElem = document.getElementById('forecast-range');
         if (rangeElem) rangeElem.innerText = `${latest.high} / ${latest.low}`;
 
         const conditionElem = document.getElementById('condition');
         if (conditionElem) conditionElem.innerText = latest.condition || 'Clear';
+
+        // Set Weather Icon
+        const iconElem = document.getElementById('weather-icon');
+        if (iconElem && latest.weather_code !== undefined) {
+        iconElem.innerHTML = getWeatherIcon(latest.weather_code);
+}
 
         // Daylight Box
         const daylightElem = document.getElementById('daylight-hours');
