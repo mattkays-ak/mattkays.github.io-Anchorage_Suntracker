@@ -16,8 +16,19 @@ WEATHER_CODES = {
     80: "Slight rain showers", 81: "Moderate rain showers", 82: "Violent rain showers"
 }
 
+def calculate_sun_peak(date_str):
+    """Calculates maximum solar elevation angle at solar noon for Anchorage."""
+    dt = datetime.strptime(date_str, "%Y-%m-%d")
+    day_of_year = dt.timetuple().tm_yday
+    
+    # Solar declination angle in degrees
+    declination = 23.45 * math.sin(math.radians((360 / 365) * (day_of_year - 81)))
+    
+    # Solar Noon Elevation Angle = 90° - Latitude + Declination
+    max_elevation = max(0.0, 90.0 - LATITUDE + declination)
+    return f"{round(max_elevation, 1)}°"
+
 def get_moon_phase_and_illumination(date_str):
-    """Calculates moon phase name and illumination percentage for a date string (YYYY-MM-DD)."""
     dt = datetime.strptime(date_str, "%Y-%m-%d")
     ref_date = datetime(2024, 1, 11)
     days_since_ref = (dt - ref_date).days + (dt.hour / 24.0)
@@ -74,6 +85,7 @@ def fetch_anchorage_sun_and_weather():
     minutes = (total_seconds % 3600) // 60
 
     moon_phase, moon_illumination = get_moon_phase_and_illumination(today_date)
+    sun_peak = calculate_sun_peak(today_date)
 
     log_entry = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -84,6 +96,7 @@ def fetch_anchorage_sun_and_weather():
         "sunrise": sunrise_dt.strftime("%I:%M %p").lstrip("0"),
         "sunset": sunset_dt.strftime("%I:%M %p").lstrip("0"),
         "daylight": f"{hours}h {minutes}m",
+        "sun_peak": sun_peak,
         "moon_phase": moon_phase,
         "moon_illumination": moon_illumination
     }
