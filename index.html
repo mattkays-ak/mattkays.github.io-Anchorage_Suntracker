@@ -434,7 +434,32 @@ function drawMoonPhase(phaseName, illuminationStr) {
     tbody.appendChild(tr);
   });
 }
+function fetchLiveTemperature() {
+  const url = "https://api.open-meteo.com/v1/forecast?latitude=61.2181&longitude=-149.9003&current=temperature_2m&temperature_unit=fahrenheit&timezone=America%2FAnchorage";
 
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.current) {
+        const temp = Math.round(data.current.temperature_2m);
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+        const tempElem = document.getElementById('current-temp');
+        if (tempElem) tempElem.innerText = `${temp}°F`;
+
+        const timeElem = document.getElementById('current-temp-time');
+        if (timeElem) timeElem.innerText = `Live as of ${timeStr}`;
+      }
+    })
+    .catch(err => console.error("Error fetching current temp:", err));
+}
+
+// Fetch immediately on load
+fetchLiveTemperature();
+
+// Refresh live temperature every 15 minutes (900,000 ms)
+setInterval(fetchLiveTemperature, 15 * 60 * 1000);
     fetch('./data.json')
       .then(res => res.json())
       .then(data => {
