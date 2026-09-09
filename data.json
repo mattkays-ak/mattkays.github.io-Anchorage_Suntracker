@@ -1,9 +1,10 @@
 [
   {
-    "timestamp": "2026-09-09T19:16:32.043385+00:00",
+    "timestamp": "2026-09-09T19:20:18.707026+00:00",
     "date": "2026-09-09",
-    "high": "64\u00b0",
+    "high": "65\u00b0",
     "low": "48\u00b0",
+    "condition": "Partly cloudy",
     "sunrise": "7:12 AM",
     "sunset": "8:40 PM",
     "daylight": "13h 28m",
