@@ -8,11 +8,9 @@ LONGITUDE = -149.9003
 TIMEZONE = "America/Anchorage"
 
 WEATHER_CODES = {
-    0: "Clear sky",
-    1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
-    45: "Fog", 48: "Depositing rime fog",
-    51: "Light drizzle", 53: "Moderate drizzle", 55: "Dense drizzle",
-    61: "Slight rain", 63: "Moderate rain", 65: "Heavy rain",
+    0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+    45: "Fog", 48: "Depositing rime fog", 51: "Light drizzle", 53: "Moderate drizzle",
+    55: "Dense drizzle", 61: "Slight rain", 63: "Moderate rain", 65: "Heavy rain",
     71: "Slight snow", 73: "Moderate snow", 75: "Heavy snow",
     80: "Slight rain showers", 81: "Moderate rain showers", 82: "Violent rain showers"
 }
@@ -36,7 +34,6 @@ def fetch_anchorage_sun_and_weather():
     daily = data["daily"]
     current = data["current"]
 
-    # Parse ISO times to standard 12-hour format (e.g. 7:15 AM)
     sunrise_dt = datetime.fromisoformat(daily["sunrise"][0])
     sunset_dt = datetime.fromisoformat(daily["sunset"][0])
 
@@ -68,14 +65,12 @@ def save_to_json_log(log_entry, filename="data.json"):
         except json.JSONDecodeError:
             data_list = []
 
-    # Replace entry for today if it exists, otherwise append
+    # Overwrite today's entry if present, otherwise append
     data_list = [item for item in data_list if item.get("date") != log_entry["date"]]
     data_list.append(log_entry)
 
     with open(filename, "w") as f:
         json.dump(data_list, f, indent=2)
-
-    print(f"Logged entry for {log_entry['date']}")
 
 if __name__ == "__main__":
     entry = fetch_anchorage_sun_and_weather()
