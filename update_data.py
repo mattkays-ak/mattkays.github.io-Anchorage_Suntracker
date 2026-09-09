@@ -23,7 +23,7 @@ def fetch_anchorage_sun_and_weather():
         "latitude": LATITUDE,
         "longitude": LONGITUDE,
         "timezone": TIMEZONE,
-        "daily": ["temperature_2m_max", "temperature_2m_min", "sunrise", "sunset", "daylight_duration", "weather_code"],
+        "daily": ["temperature_2m_max", "temperature_2m_min", "sunrise", "sunset", "daylight_duration"],
         "current": ["temperature_2m", "cloud_cover", "weather_code"],
         "temperature_unit": "fahrenheit",
         "forecast_days": 1
@@ -36,10 +36,10 @@ def fetch_anchorage_sun_and_weather():
     daily = data["daily"]
     current = data["current"]
 
-    # Format times into hh:mm
+    # Parse ISO times to standard 12-hour format (e.g. 7:15 AM)
     sunrise_dt = datetime.fromisoformat(daily["sunrise"][0])
     sunset_dt = datetime.fromisoformat(daily["sunset"][0])
-    
+
     total_seconds = int(daily["daylight_duration"][0])
     hours = total_seconds // 3600
     minutes = (total_seconds % 3600) // 60
@@ -50,8 +50,8 @@ def fetch_anchorage_sun_and_weather():
         "high": f"{round(daily['temperature_2m_max'][0])}°",
         "low": f"{round(daily['temperature_2m_min'][0])}°",
         "condition": WEATHER_CODES.get(current["weather_code"], "Cloudy"),
-        "sunrise": sunrise_dt.strftime("%I:%M %p").lstrip('0'),
-        "sunset": sunset_dt.strftime("%I:%M %p").lstrip('0'),
+        "sunrise": sunrise_dt.strftime("%I:%M %p").lstrip("0"),
+        "sunset": sunset_dt.strftime("%I:%M %p").lstrip("0"),
         "daylight": f"{hours}h {minutes}m",
         "weather_code": current["weather_code"],
         "cloud_cover": f"{current['cloud_cover']}% cloud cover"
@@ -68,14 +68,14 @@ def save_to_json_log(log_entry, filename="data.json"):
         except json.JSONDecodeError:
             data_list = []
 
-    # Overwrite or append based on date
+    # Replace entry for today if it exists, otherwise append
     data_list = [item for item in data_list if item.get("date") != log_entry["date"]]
     data_list.append(log_entry)
 
     with open(filename, "w") as f:
         json.dump(data_list, f, indent=2)
 
-    print(f"Successfully logged data for {log_entry['date']}")
+    print(f"Logged entry for {log_entry['date']}")
 
 if __name__ == "__main__":
     entry = fetch_anchorage_sun_and_weather()
