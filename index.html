@@ -406,26 +406,27 @@ function drawMoonPhase(phaseName, illuminationStr) {
 
 
     function populateArchive(data) {
-      const tbody = document.getElementById('archive-body');
-      if (!tbody) return;
-      tbody.innerHTML = '';
+  const tbody = document.getElementById('archive-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
 
-      [...data].reverse().forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><strong>${row.date || '--'}</strong></td>
-          <td>${row.high || '--'}</td>
-          <td>${row.low || '--'}</td>
-          <td>${row.condition || 'Clear'}</td>
-          <td>${row.sunrise || '--'}</td>
-          <td>${row.sunset || '--'}</td>
-          <td>${row.daylight || '--'}</td>
-          <td>${row.moon_phase || '--'}</td>
-          <td>${row.moon_illumination || '--'}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+  [...data].reverse().forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${row.date || '--'}</strong></td>
+      <td>${row.high || '--'}</td>
+      <td>${row.low || '--'}</td>
+      <td>${row.condition || 'Clear'}</td>
+      <td>${row.sunrise || '--'}</td>
+      <td>${row.sunset || '--'}</td>
+      <td>${row.daylight || '--'}</td>
+      <td>${row.sun_peak || '--'}</td>
+      <td>${row.moon_phase || '--'}</td>
+      <td>${row.moon_illumination || '--'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
 
     fetch('./data.json')
       .then(res => res.json())
