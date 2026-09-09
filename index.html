@@ -357,35 +357,27 @@ fetch('./data.json')
   .then(res => res.json())
   .then(data => {
     if (!data || data.length === 0) return;
-    
-    // Get latest entry
     const latest = data[data.length - 1];
 
-    // 1. Update Temperature Display
-    const tempElem = document.querySelector('.forecast-range, #forecast-range, .metric-value');
-    if (tempElem) {
-      tempElem.innerText = `${Math.round(latest.current_temp_f)}°F`;
-    }
+    // Forecast Range Box
+    const rangeElem = document.getElementById('forecast-range');
+    if (rangeElem) rangeElem.innerHTML = `${latest.high} / ${latest.low}`;
 
-    // 2. Update Daylight Hours Display
-    const daylightElem = document.getElementById('daylight-hours') || document.querySelector('.daylight-value');
-    if (daylightElem) {
-      daylightElem.innerText = `${latest.daylight_hours}h`;
-    }
+    // Daylight Box
+    const daylightElem = document.getElementById('daylight-hours');
+    if (daylightElem) daylightElem.innerText = latest.daylight;
 
-    // 3. Update Sunrise / Sunset
-    const sunriseTime = latest.sunrise.split('T')[1];
-    const sunsetTime = latest.sunset.split('T')[1];
-    const sunSubElem = document.querySelector('.sun-times') || document.getElementById('sun-times');
-    if (sunSubElem) {
-      sunSubElem.innerText = `${sunriseTime} sunrise • ${sunsetTime} sunset`;
-    }
+    const sunTimesElem = document.getElementById('sun-times');
+    if (sunTimesElem) sunTimesElem.innerText = `${latest.sunrise} sunrise • ${latest.sunset} sunset`;
 
-    // 4. Update Moon / Cloud Report
-    document.getElementById('moon-phase').innerText = `Code ${latest.weather_code}`;
-    document.getElementById('moon-illum').innerText = `${latest.cloud_cover_pct}% cloud cover`;
+    // Moon / Weather Report Box
+    const moonPhaseElem = document.getElementById('moon-phase');
+    if (moonPhaseElem) moonPhaseElem.innerText = latest.condition;
 
-    // 5. Render Canvas & Table
+    const moonIllumElem = document.getElementById('moon-illum');
+    if (moonIllumElem) moonIllumElem.innerText = latest.cloud_cover;
+
+    // Render Canvas & Table Archive
     if (typeof drawSkyLog === 'function') drawSkyLog(latest.sunrise, latest.sunset);
     if (typeof populateArchive === 'function') populateArchive(data);
   })
