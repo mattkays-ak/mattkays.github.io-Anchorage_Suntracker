@@ -131,51 +131,60 @@
     <div id="update-date">UPDATED --</div>
   </div>
 
-  <!-- TOP TITLE AREA & GRAPHIC -->
-  <div class="title-area">
-    <div>
-      <div style="color: var(--accent-orange); font-family: 'JetBrains Mono'; font-size: 11px; text-transform: uppercase;">
-        Today in Anchorage
-      </div>
-      <h1>Anchorage <span>Suntracker</span></h1>
-      <p class="subtext">
-        A living record of weather, light, and the moon for our corner of Alaska.
-      </p>
+<!-- TOP HEADER SECTION -->
+<div class="title-area" style="display: grid; grid-template-columns: 1fr 640px; gap: 32px; align-items: start; margin-top: 20px;">
+  
+  <!-- Left Side: Title & Current Temperature Card -->
+  <div>
+    <div style="color: var(--accent-orange); font-family: 'JetBrains Mono'; font-size: 11px; text-transform: uppercase;">
+      Today in Anchorage
     </div>
-    <div style="display: flex; justify-content: center; align-items: center; position: relative;">
-  <canvas id="skyCanvas" width="640" height="440"></canvas>
-</div>
+    <h1 style="margin: 8px 0;">Anchorage <span>Suntracker</span></h1>
+    <p class="subtext" style="margin-bottom: 24px;">
+      A living record of weather, light, and the moon for our corner of Alaska.
+    </p>
+
+    <!-- NARROW CURRENT TEMP CARD -->
+    <div class="card" style="background-color: #FAF8F5; padding: 20px; min-height: auto;">
+      <div class="card-label">Current Temperature</div>
+      <div style="display: flex; align-items: baseline; gap: 12px; margin-top: 8px;">
+        <div class="metric-primary" id="current-temp" style="font-size: 44px; color: var(--accent-orange); margin: 0;">--°F</div>
+        <div class="metric-sub" id="current-temp-time">Fetching live temperature...</div>
+      </div>
+    </div>
   </div>
 
-  <div class="grid">
-    <div class="card" style="grid-column: span 3; background-color: #FAF8F5;">
-    <div class="card-label">Current Temperature</div>
-    <div style="display: flex; align-items: baseline; gap: 16px;">
-      <div class="metric-primary" id="current-temp" style="font-size: 52px; color: var(--accent-orange);">--°F</div>
-      <div class="metric-sub" id="current-temp-time">Fetching live temperature...</div>
-    </div>
+  <!-- Right Side: Sky Canvas -->
+  <div style="display: flex; justify-content: center; align-items: center; position: relative;">
+    <canvas id="skyCanvas" width="640" height="440"></canvas>
   </div>
-    <div class="card">
-      <div class="card-label">Forecast Range</div>
-      <div class="metric-primary" id="forecast-range">--° / --°</div>
-      <div class="metric-sub" id="condition">Loading...</div>
-    </div>
-    <div class="card">
-      <div class="card-label">Daylight</div>
-      <div class="metric-primary" id="daylight-hours">--h --m</div>
-      <div class="metric-sub" id="sun-times">--:-- sunrise • --:-- sunset</div>
-    </div>
-    <div class="card">
-      <div class="card-label">Moon Report</div>
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
-        <div>
-          <div class="metric-primary" id="moon-phase" style="font-size: 28px; text-transform: capitalize;">--</div>
-          <div class="metric-sub" id="moon-illum">--% illuminated</div>
-        </div>
-        <canvas id="moonCanvas" width="70" height="70"></canvas>
+</div>
+
+<!-- BOTTOM 3-CARD GRID -->
+<div class="grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 32px;">
+  <div class="card">
+    <div class="card-label">Forecast Range</div>
+    <div class="metric-primary" id="forecast-range">--° / --°</div>
+    <div class="metric-sub" id="condition">Loading...</div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Daylight</div>
+    <div class="metric-primary" id="daylight-hours">--h --m</div>
+    <div class="metric-sub" id="sun-times">--:-- sunrise • --:-- sunset</div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Moon Report</div>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+      <div>
+        <div class="metric-primary" id="moon-phase" style="font-size: 28px; text-transform: capitalize;">--</div>
+        <div class="metric-sub" id="moon-illum">--% illuminated</div>
       </div>
+      <canvas id="moonCanvas" width="70" height="70"></canvas>
     </div>
   </div>
+</div>
 
   <!-- OBSERVATION ARCHIVE TABLE -->
   <div class="archive-section">
