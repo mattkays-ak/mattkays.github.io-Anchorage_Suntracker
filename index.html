@@ -266,61 +266,80 @@
       ctx.fillText('ALASKA', centerX, centerY + 65);
       ctx.fillText('SKY LOG', centerX, centerY + 78);
     }
+function drawMoonPhase(phaseName, illuminationStr) {
+  const canvas = document.getElementById('moonCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const size = canvas.width;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size / 2 - 4;
 
-    function drawMoonPhase(phaseName, illuminationStr) {
-      const canvas = document.getElementById('moonCanvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const size = canvas.width;
-      const cx = size / 2;
-      const cy = size / 2;
-      const r = size / 2 - 4;
+  let illum = parseFloat(illuminationStr) / 100;
+  if (isNaN(illum)) illum = 0.5;
 
-      let illum = parseFloat(illuminationStr) / 100;
-      if (isNaN(illum)) illum = 0.5;
+  const phase = (phaseName || '').toLowerCase();
+  const isWaning = phase.includes('waning') || phase.includes('last');
+  const isFull = phase.includes('full');
+  const isNew = phase.includes('new');
 
-      const phase = (phaseName || '').toLowerCase();
-      const isWaning = phase.includes('waning') || phase.includes('last');
-      const isFull = phase.includes('full');
-      const isNew = phase.includes('new');
+  ctx.clearRect(0, 0, size, size);
 
-      ctx.clearRect(0, 0, size, size);
+  // Dark shadow base circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+  ctx.fillStyle = '#1C1C1E';
+  ctx.fill();
 
-      // Dark shadow base circle
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-      ctx.fillStyle = '#1C1C1E';
-      ctx.fill();
+  if (isFull || illum >= 0.99) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fill();
+    return;
+  }
 
-      if (isFull || illum >= 0.99) {
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fill();
-        return;
-      }
+  if (isNew || illum <= 0.01) return;
 
-      if (isNew || illum <= 0.01) return;
+  // Draw white illuminated disk section
+  ctx.fillStyle = '#FFFFFF';
+  ctx.beginPath();
 
-      // Draw white illuminated disk section
-      const xOffset = r * (2 * illum - 1);
-      ctx.beginPath();
-      if (isWaning) {
-        ctx.arc(cx, cy, r, Math.PI / 2, -Math.PI / 2, false);
-      } else {
-        ctx.arc(cx, cy, r, -Math.PI / 2, Math.PI / 2, false);
-      }
-      ctx.ellipse(cx, cy, Math.abs(xOffset), r, 0, Math.PI / 2, -Math.PI / 2, xOffset < 0 ? !isWaning : isWaning);
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fill();
+  // Width of the terminator curve
+  const curveWidth = Math.abs(r * (2 * illum - 1));
 
-      // Border outline
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-      ctx.strokeStyle = '#D8D3C8';
-      ctx.lineWidth = 1;
-      ctx.stroke();
+  if (isWaning) {
+    // Light is on the LEFT side for Waning phases
+    ctx.arc(cx, cy, r, Math.PI / 2, (3 * Math.PI) / 2, false);
+    if (illum < 0.5) {
+      // Crescent: curve bends inward toward the left
+      ctx.ellipse(cx, cy, curveWidth, r, 0, (3 * Math.PI) / 2, Math.PI / 2, true);
+    } else {
+      // Gibbous: curve bends outward toward the right
+      ctx.ellipse(cx, cy, curveWidth, r, 0, (3 * Math.PI) / 2, Math.PI / 2, false);
     }
+  } else {
+    // Light is on the RIGHT side for Waxing phases
+    ctx.arc(cx, cy, r, (3 * Math.PI) / 2, Math.PI / 2, false);
+    if (illum < 0.5) {
+      // Crescent: curve bends inward toward the right
+      ctx.ellipse(cx, cy, curveWidth, r, 0, Math.PI / 2, (3 * Math.PI) / 2, true);
+    } else {
+      // Gibbous: curve bends outward toward the left
+      ctx.ellipse(cx, cy, curveWidth, r, 0, Math.PI / 2, (3 * Math.PI) / 2, false);
+    }
+  }
+
+  ctx.fill();
+
+  // Border outline
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+  ctx.strokeStyle = '#D8D3C8';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
 
     function populateArchive(data) {
       const tbody = document.getElementById('archive-body');
