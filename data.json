@@ -8,5 +8,15 @@
     "current_temp_f": 57.7,
     "cloud_cover_pct": 59,
     "weather_code": 2
+  },
+  {
+    "timestamp": "2026-09-09T18:50:26.556191+00:00",
+    "date": "2026-09-09",
+    "sunrise": "2026-09-09T07:12",
+    "sunset": "2026-09-09T20:40",
+    "daylight_hours": 13.48,
+    "current_temp_f": 58.1,
+    "cloud_cover_pct": 62,
+    "weather_code": 2
   }
 ]
