@@ -8,22 +8,25 @@ LATITUDE = 61.2181
 LONGITUDE = -149.9003
 TIMEZONE = "America/Anchorage"
 
+WEATHER_CODES = {
+    0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+    45: "Fog", 48: "Depositing rime fog", 51: "Light drizzle", 53: "Moderate drizzle",
+    55: "Dense drizzle", 61: "Slight rain", 63: "Moderate rain", 65: "Heavy rain",
+    71: "Slight snow", 73: "Moderate snow", 75: "Heavy snow",
+    80: "Slight rain showers", 81: "Moderate rain showers", 82: "Violent rain showers"
+}
+
 def get_moon_phase_and_illumination(date_str):
     """Calculates moon phase name and illumination percentage for a date string (YYYY-MM-DD)."""
     dt = datetime.strptime(date_str, "%Y-%m-%d")
-    
-    # Known new moon reference date: Jan 11, 2024
     ref_date = datetime(2024, 1, 11)
     days_since_ref = (dt - ref_date).days + (dt.hour / 24.0)
     
-    # Synodic month length (average lunar cycle)
     lunar_cycle = 29.53058770576
-    phase_value = (days_since_ref % lunar_cycle) / lunar_cycle # 0.0 to 1.0
+    phase_value = (days_since_ref % lunar_cycle) / lunar_cycle
 
-    # Determine Illumination % (0% at New Moon, 100% at Full Moon)
     illumination = round((1 - math.cos(phase_value * 2 * math.pi)) / 2 * 100)
 
-    # Determine Moon Phase Name
     if phase_value < 0.03 or phase_value >= 0.97:
         phase_name = "New Moon"
     elif phase_value < 0.22:
@@ -50,7 +53,7 @@ def fetch_anchorage_sun_and_weather():
         "longitude": LONGITUDE,
         "timezone": TIMEZONE,
         "daily": ["temperature_2m_max", "temperature_2m_min", "sunrise", "sunset", "daylight_duration"],
-        "current": ["temperature_2m"],
+        "current": ["temperature_2m", "weather_code"],
         "temperature_unit": "fahrenheit",
         "forecast_days": 1
     }
@@ -60,6 +63,7 @@ def fetch_anchorage_sun_and_weather():
     data = response.json()
 
     daily = data["daily"]
+    current = data["current"]
     today_date = daily["time"][0]
 
     sunrise_dt = datetime.fromisoformat(daily["sunrise"][0])
@@ -69,7 +73,6 @@ def fetch_anchorage_sun_and_weather():
     hours = total_seconds // 3600
     minutes = (total_seconds % 3600) // 60
 
-    # Calculate moon details
     moon_phase, moon_illumination = get_moon_phase_and_illumination(today_date)
 
     log_entry = {
@@ -77,6 +80,7 @@ def fetch_anchorage_sun_and_weather():
         "date": today_date,
         "high": f"{round(daily['temperature_2m_max'][0])}°",
         "low": f"{round(daily['temperature_2m_min'][0])}°",
+        "condition": WEATHER_CODES.get(current["weather_code"], "Cloudy"),
         "sunrise": sunrise_dt.strftime("%I:%M %p").lstrip("0"),
         "sunset": sunset_dt.strftime("%I:%M %p").lstrip("0"),
         "daylight": f"{hours}h {minutes}m",
