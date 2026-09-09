@@ -359,25 +359,25 @@ fetch('./data.json')
     if (!data || data.length === 0) return;
     const latest = data[data.length - 1];
 
-    // Forecast Range Box
+    // Forecast Range
     const rangeElem = document.getElementById('forecast-range');
     if (rangeElem) rangeElem.innerHTML = `${latest.high} / ${latest.low}`;
 
-    // Daylight Box
+    // Daylight & Sun Times
     const daylightElem = document.getElementById('daylight-hours');
     if (daylightElem) daylightElem.innerText = latest.daylight;
 
     const sunTimesElem = document.getElementById('sun-times');
     if (sunTimesElem) sunTimesElem.innerText = `${latest.sunrise} sunrise • ${latest.sunset} sunset`;
 
-    // Moon / Weather Report Box
+    // Weather Report
     const moonPhaseElem = document.getElementById('moon-phase');
     if (moonPhaseElem) moonPhaseElem.innerText = latest.condition;
 
     const moonIllumElem = document.getElementById('moon-illum');
     if (moonIllumElem) moonIllumElem.innerText = latest.cloud_cover;
 
-    // Render Canvas & Table Archive
+    // Archive & Canvas
     if (typeof drawSkyLog === 'function') drawSkyLog(latest.sunrise, latest.sunset);
     if (typeof populateArchive === 'function') populateArchive(data);
   })
