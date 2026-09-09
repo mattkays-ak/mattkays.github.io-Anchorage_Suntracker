@@ -2,14 +2,14 @@ name: Daily Anchorage Suntracker Update
 
 on:
   schedule:
-    - cron: '0 17 * * *' # 9:00 AM AKDT (17:00 UTC)
+    - cron: '0 17 * * *'
   workflow_dispatch:
 
 jobs:
   update-data:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Grants permission to commit updated JSON back to main
+      contents: write # Essential for committing updated data.json back to main
 
     steps:
       - name: Checkout Repository
