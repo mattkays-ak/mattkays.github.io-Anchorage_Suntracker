@@ -17,14 +17,9 @@ WEATHER_CODES = {
 }
 
 def calculate_sun_peak(date_str):
-    """Calculates maximum solar elevation angle at solar noon for Anchorage."""
     dt = datetime.strptime(date_str, "%Y-%m-%d")
     day_of_year = dt.timetuple().tm_yday
-    
-    # Solar declination angle in degrees
     declination = 23.45 * math.sin(math.radians((360 / 365) * (day_of_year - 81)))
-    
-    # Solar Noon Elevation Angle = 90° - Latitude + Declination
     max_elevation = max(0.0, 90.0 - LATITUDE + declination)
     return f"{round(max_elevation, 1)}°"
 
@@ -93,6 +88,7 @@ def fetch_anchorage_sun_and_weather():
         "high": f"{round(daily['temperature_2m_max'][0])}°",
         "low": f"{round(daily['temperature_2m_min'][0])}°",
         "condition": WEATHER_CODES.get(current["weather_code"], "Cloudy"),
+        "weather_code": current["weather_code"],  # ADDED THIS FIELD
         "sunrise": sunrise_dt.strftime("%I:%M %p").lstrip("0"),
         "sunset": sunset_dt.strftime("%I:%M %p").lstrip("0"),
         "daylight": f"{hours}h {minutes}m",
