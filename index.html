@@ -480,9 +480,11 @@
         const conditionElem = document.getElementById('condition');
         if (conditionElem) conditionElem.innerText = latest.condition || 'Clear';
 
+        // Render Weather Icon (with fallback to 3/Overcast if weather_code is missing)
         const iconElem = document.getElementById('weather-icon');
-        if (iconElem && latest.weather_code !== undefined) {
-          iconElem.innerHTML = getWeatherIcon(latest.weather_code);
+        if (iconElem) {
+          const code = latest.weather_code !== undefined ? latest.weather_code : 3;
+          iconElem.innerHTML = getWeatherIcon(code);
         }
 
         const daylightElem = document.getElementById('daylight-hours');
