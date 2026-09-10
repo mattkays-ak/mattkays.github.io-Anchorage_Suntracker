@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 LATITUDE = 61.2181
 LONGITUDE = -149.9003
 TIMEZONE = "America/Anchorage"
+NOAA_STATION_ID = "9455920" # Anchorage, AK NOAA Station
 
 WEATHER_CODES = {
     0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
@@ -52,6 +53,27 @@ def get_moon_phase_and_illumination(date_str):
 
     return phase_name, f"{illumination}% illuminated"
 
+def fetch_noaa_tides(date_str):
+    """Fetches high and low tide predictions from NOAA CO-OPS API for Anchorage."""
+    formatted_date = date_str.replace("-", "")
+    url = f"https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date={formatted_date}&end_date={formatted_date}&station={NOAA_STATION_ID}&product=predictions&datum=MLLW&time_zone=lst_ldt&units=english&interval=hilo&format=json"
+    
+    try:
+        res = requests.get(url, timeout=10)
+        res.raise_for_status()
+        data = res.json()
+        predictions = data.get("predictions", [])
+        
+        highs = [float(p["v"]) for p in predictions if p["type"] == "H"]
+        lows = [float(p["v"]) for p in predictions if p["type"] == "L"]
+        
+        high_str = f"{max(highs):.1f} ft" if highs else "-- ft"
+        low_str = f"{min(lows):.1f} ft" if lows else "-- ft"
+        return high_str, low_str
+    except Exception as e:
+        print(f"NOAA Tide Fetch Error: {e}")
+        return "-- ft", "-- ft"
+
 def fetch_anchorage_sun_and_weather():
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
@@ -81,6 +103,7 @@ def fetch_anchorage_sun_and_weather():
 
     moon_phase, moon_illumination = get_moon_phase_and_illumination(today_date)
     sun_peak = calculate_sun_peak(today_date)
+    high_tide, low_tide = fetch_noaa_tides(today_date)
 
     log_entry = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -88,13 +111,15 @@ def fetch_anchorage_sun_and_weather():
         "high": f"{round(daily['temperature_2m_max'][0])}°",
         "low": f"{round(daily['temperature_2m_min'][0])}°",
         "condition": WEATHER_CODES.get(current["weather_code"], "Cloudy"),
-        "weather_code": current["weather_code"],  # ADDED THIS FIELD
+        "weather_code": current["weather_code"],
         "sunrise": sunrise_dt.strftime("%I:%M %p").lstrip("0"),
         "sunset": sunset_dt.strftime("%I:%M %p").lstrip("0"),
         "daylight": f"{hours}h {minutes}m",
         "sun_peak": sun_peak,
         "moon_phase": moon_phase,
-        "moon_illumination": moon_illumination
+        "moon_illumination": moon_illumination,
+        "high_tide": high_tide,
+        "low_tide": low_tide
     }
 
     return log_entry
