@@ -11,5 +11,19 @@
     "sun_peak": "33.4\u00b0",
     "moon_phase": "Waning Crescent",
     "moon_illumination": "7% illuminated"
+  },
+  {
+    "timestamp": "2026-09-10T17:09:09.546458+00:00",
+    "date": "2026-09-10",
+    "high": "62\u00b0",
+    "low": "51\u00b0",
+    "condition": "Overcast",
+    "weather_code": 3,
+    "sunrise": "7:14 AM",
+    "sunset": "8:36 PM",
+    "daylight": "13h 22m",
+    "sun_peak": "33.0\u00b0",
+    "moon_phase": "Waning Crescent",
+    "moon_illumination": "3% illuminated"
   }
 ]
