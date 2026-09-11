@@ -25,5 +25,21 @@
     "sun_peak": "33.0\u00b0",
     "moon_phase": "Waning Crescent",
     "moon_illumination": "3% illuminated"
+  },
+  {
+    "timestamp": "2026-09-11T17:08:13.067107+00:00",
+    "date": "2026-09-11",
+    "high": "62\u00b0",
+    "low": "48\u00b0",
+    "condition": "Mainly clear",
+    "weather_code": 1,
+    "sunrise": "7:17 AM",
+    "sunset": "8:33 PM",
+    "daylight": "13h 17m",
+    "sun_peak": "32.6\u00b0",
+    "moon_phase": "New Moon",
+    "moon_illumination": "0% illuminated",
+    "high_tide": "31.8 ft",
+    "low_tide": "-1.3 ft"
   }
 ]
