@@ -233,5 +233,21 @@
     "moon_illumination": "88% illuminated",
     "high_tide": "28.2 ft",
     "low_tide": "1.9 ft"
+  },
+  {
+    "timestamp": "2026-09-24T17:08:29.777250+00:00",
+    "date": "2026-09-24",
+    "high": "56\u00b0",
+    "low": "38\u00b0",
+    "condition": "Overcast",
+    "weather_code": 3,
+    "sunrise": "7:49 AM",
+    "sunset": "7:52 PM",
+    "daylight": "12h 3m",
+    "sun_peak": "27.4\u00b0",
+    "moon_phase": "Waxing Gibbous",
+    "moon_illumination": "94% illuminated",
+    "high_tide": "29.4 ft",
+    "low_tide": "0.9 ft"
   }
 ]
