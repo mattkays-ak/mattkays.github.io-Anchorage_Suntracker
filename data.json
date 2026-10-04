@@ -393,5 +393,21 @@
     "moon_illumination": "57% illuminated",
     "high_tide": "25.2 ft",
     "low_tide": "2.3 ft"
+  },
+  {
+    "timestamp": "2026-10-04T19:53:44.709899+00:00",
+    "date": "2026-10-04",
+    "high": "44\u00b0",
+    "low": "37\u00b0",
+    "condition": "Light drizzle",
+    "weather_code": 51,
+    "sunrise": "8:14 AM",
+    "sunset": "7:20 PM",
+    "daylight": "11h 6m",
+    "sun_peak": "23.4\u00b0",
+    "moon_phase": "Last Quarter",
+    "moon_illumination": "46% illuminated",
+    "high_tide": "25.7 ft",
+    "low_tide": "3.4 ft"
   }
 ]
