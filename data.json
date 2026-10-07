@@ -441,5 +441,21 @@
     "moon_illumination": "26% illuminated",
     "high_tide": "28.3 ft",
     "low_tide": "2.8 ft"
+  },
+  {
+    "timestamp": "2026-10-07T21:45:47.988889+00:00",
+    "date": "2026-10-07",
+    "high": "51\u00b0",
+    "low": "38\u00b0",
+    "condition": "Mainly clear",
+    "weather_code": 1,
+    "sunrise": "8:22 AM",
+    "sunset": "7:11 PM",
+    "daylight": "10h 49m",
+    "sun_peak": "22.2\u00b0",
+    "moon_phase": "Waning Crescent",
+    "moon_illumination": "17% illuminated",
+    "high_tide": "29.7 ft",
+    "low_tide": "1.5 ft"
   }
 ]
