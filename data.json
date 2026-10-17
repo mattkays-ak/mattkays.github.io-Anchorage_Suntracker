@@ -601,5 +601,21 @@
     "moon_illumination": "25% illuminated",
     "high_tide": "26.0 ft",
     "low_tide": "2.0 ft"
+  },
+  {
+    "timestamp": "2026-10-17T19:01:01.359738+00:00",
+    "date": "2026-10-17",
+    "high": "44\u00b0",
+    "low": "34\u00b0",
+    "condition": "Fog",
+    "weather_code": 45,
+    "sunrise": "8:48 AM",
+    "sunset": "6:40 PM",
+    "daylight": "9h 52m",
+    "sun_peak": "18.5\u00b0",
+    "moon_phase": "Waxing Crescent",
+    "moon_illumination": "35% illuminated",
+    "high_tide": "24.9 ft",
+    "low_tide": "3.1 ft"
   }
 ]
