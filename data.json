@@ -729,5 +729,21 @@
     "moon_illumination": "96% illuminated",
     "high_tide": "30.8 ft",
     "low_tide": "1.1 ft"
+  },
+  {
+    "timestamp": "2026-10-25T19:26:30.447686+00:00",
+    "date": "2026-10-25",
+    "high": "41\u00b0",
+    "low": "34\u00b0",
+    "condition": "Light drizzle",
+    "weather_code": 51,
+    "sunrise": "9:09 AM",
+    "sunset": "6:16 PM",
+    "daylight": "9h 7m",
+    "sun_peak": "15.7\u00b0",
+    "moon_phase": "Full Moon",
+    "moon_illumination": "99% illuminated",
+    "high_tide": "31.7 ft",
+    "low_tide": "-0.4 ft"
   }
 ]
