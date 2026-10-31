@@ -825,5 +825,21 @@
     "moon_illumination": "81% illuminated",
     "high_tide": "29.3 ft",
     "low_tide": "-0.7 ft"
+  },
+  {
+    "timestamp": "2026-10-31T20:23:35.384285+00:00",
+    "date": "2026-10-31",
+    "high": "39\u00b0",
+    "low": "31\u00b0",
+    "condition": "Fog",
+    "weather_code": 45,
+    "sunrise": "9:25 AM",
+    "sunset": "5:59 PM",
+    "daylight": "8h 34m",
+    "sun_peak": "13.7\u00b0",
+    "moon_phase": "Waning Gibbous",
+    "moon_illumination": "72% illuminated",
+    "high_tide": "27.4 ft",
+    "low_tide": "0.5 ft"
   }
 ]
