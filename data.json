@@ -873,5 +873,21 @@
     "moon_illumination": "52% illuminated",
     "high_tide": "26.7 ft",
     "low_tide": "3.0 ft"
+  },
+  {
+    "timestamp": "2026-11-03T22:11:51.923812+00:00",
+    "date": "2026-11-03",
+    "high": "38\u00b0",
+    "low": "33\u00b0",
+    "condition": "Overcast",
+    "weather_code": 3,
+    "sunrise": "8:34 AM",
+    "sunset": "4:51 PM",
+    "daylight": "8h 17m",
+    "sun_peak": "12.8\u00b0",
+    "moon_phase": "Last Quarter",
+    "moon_illumination": "41% illuminated",
+    "high_tide": "27.6 ft",
+    "low_tide": "3.7 ft"
   }
 ]
