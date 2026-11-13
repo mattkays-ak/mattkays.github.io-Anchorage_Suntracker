@@ -1017,5 +1017,21 @@
     "moon_illumination": "2% illuminated",
     "high_tide": "29.9 ft",
     "low_tide": "-0.6 ft"
+  },
+  {
+    "timestamp": "2026-11-13T22:22:46.646187+00:00",
+    "date": "2026-11-13",
+    "high": "31\u00b0",
+    "low": "27\u00b0",
+    "condition": "Overcast",
+    "weather_code": 3,
+    "sunrise": "9:01 AM",
+    "sunset": "4:25 PM",
+    "daylight": "7h 24m",
+    "sun_peak": "10.1\u00b0",
+    "moon_phase": "Waxing Crescent",
+    "moon_illumination": "13% illuminated",
+    "high_tide": "27.7 ft",
+    "low_tide": "0.7 ft"
   }
 ]
