@@ -2,7 +2,8 @@ name: Daily Anchorage Suntracker Update
 
 on:
   schedule:
-    - cron: '17 17 * * *' # Runs daily at 8:17 AM AKST (avoids top-of-hour API spikes)
+    # Runs at 16:47 UTC (8:47 AM AKDT in summer / 7:47 AM AKST in winter)
+    - cron: '47 16 * * *'
   workflow_dispatch:
 
 jobs:
