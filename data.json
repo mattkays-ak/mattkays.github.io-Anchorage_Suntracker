@@ -1211,12 +1211,12 @@
     "low_tide": "-1.1 ft"
   },
   {
-    "timestamp": "2026-11-24T21:03:49.955609+00:00",
+    "timestamp": "2026-11-24T23:36:41.845553+00:00",
     "date": "2026-11-24",
     "high": "19\u00b0",
     "low": "11\u00b0",
-    "condition": "Fog",
-    "weather_code": 45,
+    "condition": "Overcast",
+    "weather_code": 3,
     "sunrise": "9:30 AM",
     "sunset": "4:02 PM",
     "daylight": "6h 32m",
