@@ -280,14 +280,35 @@
   padding: 18px 20px;
   margin-bottom: 16px;
 ">
-  <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-    <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px;">
-      Archival Correlation Strip • Hover to Scrub
-    </span>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px;">
+        Correlation Strip
+      </span>
+      <div id="visualizer-pills" style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <button type="button" class="vis-pill active" data-filter="all" style="
+          font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 10px;
+          border-radius: 999px; border: 1px solid var(--text-main);
+          background: var(--text-main); color: #FAF8F5; cursor: pointer; transition: all 0.15s ease;
+        ">All Trends</button>
+        <button type="button" class="vis-pill" data-filter="solar" style="
+          font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 10px;
+          border-radius: 999px; border: 1px solid var(--card-border);
+          background: transparent; color: var(--text-sub); cursor: pointer; transition: all 0.15s ease;
+        ">Solar &amp; Temp</button>
+        <button type="button" class="vis-pill" data-filter="lunar" style="
+          font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 10px;
+          border-radius: 999px; border: 1px solid var(--card-border);
+          background: transparent; color: var(--text-sub); cursor: pointer; transition: all 0.15s ease;
+        ">Moon &amp; Tides</button>
+      </div>
+    </div>
+
     <span id="scrub-readout" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-main); font-weight: 600;">
-      Move cursor across timeline to inspect daily correlations
+      Hover across timeline to inspect • Click to jump to row
     </span>
   </div>
+
   <svg id="correlation-svg" viewBox="0 0 900 265" style="width: 100%; height: auto; display: block; cursor: crosshair;"></svg>
 </div>
     <div class="table-container">
