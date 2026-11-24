@@ -274,6 +274,22 @@
   <!-- OBSERVATION ARCHIVE TABLE -->
   <div class="archive-section">
     <div class="archive-title">Observation Archive</div>
+    <div id="suntracker-visualizer" style="
+  border: 1px solid var(--card-border);
+  background-color: #FAF8F5;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px;">
+      Archival Correlation Strip • Hover to Scrub
+    </span>
+    <span id="scrub-readout" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-main); font-weight: 600;">
+      Move cursor across timeline to inspect daily correlations
+    </span>
+  </div>
+  <svg id="correlation-svg" viewBox="0 0 900 265" style="width: 100%; height: auto; display: block; cursor: crosshair;"></svg>
+</div>
     <div class="table-container">
       <table class="archive-table">
         <thead>
@@ -645,5 +661,216 @@
       })
       .catch(err => console.error("Data Fetch Error:", err));
   </script>
+(function () {
+  const tbody = document.getElementById("archive-body");
+  const svg = document.getElementById("correlation-svg");
+  const readout = document.getElementById("scrub-readout");
+  if (!tbody || !svg) return;
+
+  function renderVisualizer() {
+    // Grab all populated rows (skipping the initial "Loading observations..." placeholder)
+    const rows = Array.from(tbody.querySelectorAll("tr"))
+      .filter((tr) => tr.querySelectorAll("td").length >= 12)
+      .reverse(); // Chronological: oldest (left) -> newest (right)
+
+    if (rows.length < 2) return;
+
+    const data = rows.map((tr) => {
+      const cells = Array.from(tr.querySelectorAll("td")).map((td) => td.textContent.trim());
+      const [date, high, low, cond, , , daylight, , highTide, lowTide, phase, illum] = cells;
+
+      const dlMatch = daylight.match(/(\d+)h\s*(\d+)m/);
+      const dlHours = dlMatch ? parseInt(dlMatch[1], 10) + parseInt(dlMatch[2], 10) / 60 : null;
+
+      return {
+        tr,
+        date,
+        high: parseFloat(high),
+        low: parseFloat(low),
+        cond,
+        dlText: daylight,
+        dlHours,
+        highTide: highTide === "--" || highTide === "" ? null : parseFloat(highTide),
+        lowTide: lowTide === "--" || lowTide === "" ? null : parseFloat(lowTide),
+        phase,
+        illum: parseFloat(illum)
+      };
+    }).filter((d) => !isNaN(d.high));
+
+    if (data.length < 2) return;
+
+    // Auto-scaling seasonal bounds so winter freezes & summer solstice never clip
+    const allTemps = data.flatMap((d) => [d.high, d.low]);
+    const minTemp = Math.min(0, Math.floor((Math.min(...allTemps) - 5) / 5) * 5);
+    const maxTemp = Math.max(70, Math.ceil((Math.max(...allTemps) + 5) / 5) * 5);
+
+    const allDl = data.map((d) => d.dlHours).filter((v) => v !== null);
+    const minDl = Math.max(4, Math.floor(Math.min(...allDl) - 0.5));
+    const maxDl = Math.min(21, Math.ceil(Math.max(...allDl) + 0.5));
+
+    const allTides = data.flatMap((d) => [d.highTide, d.lowTide]).filter((v) => v !== null);
+    const minTide = Math.min(-5, Math.floor(Math.min(...allTides) - 1));
+    const maxTide = Math.max(35, Math.ceil(Math.max(...allTides) + 1));
+
+    // Clear previous render if re-triggered
+    svg.innerHTML = "";
+
+    const W = 900, padL = 44, padR = 16;
+    const plotW = W - padL - padR;
+    const xScale = (i) => padL + (i / (data.length - 1)) * plotW;
+
+    const t1 = { top: 16, bot: 118 };  // Solar & Temp
+    const t2 = { top: 142, bot: 236 }; // Moon & Tides
+    const t3 = { top: 246, bot: 256 }; // Sky Condition Barcode
+
+    const mapY = (val, min, max, top, bot) =>
+      bot - ((val - min) / (max - min)) * (bot - top);
+
+    const ns = "http://www.w3.org/2000/svg";
+    const el = (tag, attrs = {}) => {
+      const node = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+      return node;
+    };
+
+    // 32°F Freezing Reference Line
+    if (32 >= minTemp && 32 <= maxTemp) {
+      const y32 = mapY(32, minTemp, maxTemp, t1.top, t1.bot);
+      svg.appendChild(el("line", {
+        x1: padL, x2: W - padR, y1: y32, y2: y32,
+        stroke: "#D8D3C8", "stroke-dasharray": "3 3", "stroke-width": "1"
+      }));
+      const lbl32 = el("text", {
+        x: 4, y: y32 + 3,
+        "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#76736E"
+      });
+      lbl32.textContent = "32°F";
+      svg.appendChild(lbl32);
+    }
+
+    // Track 1A: Daylight Hours Area (--accent-yellow: #F0B35B)
+    let dlPath = `M ${xScale(0)} ${t1.bot} `;
+    data.forEach((d, i) => {
+      if (d.dlHours !== null) {
+        dlPath += `L ${xScale(i)} ${mapY(d.dlHours, minDl, maxDl, t1.top, t1.bot)} `;
+      }
+    });
+    dlPath += `L ${xScale(data.length - 1)} ${t1.bot} Z`;
+    svg.appendChild(el("path", { d: dlPath, fill: "rgba(240, 179, 91, 0.28)" }));
+
+    // Track 1B: Temperature High/Low Ribbon (--accent-orange: #E25B36)
+    const tempTop = [], tempBot = [];
+    data.forEach((d, i) => {
+      tempTop.push(`${i === 0 ? "M" : "L"} ${xScale(i)} ${mapY(d.high, minTemp, maxTemp, t1.top, t1.bot)}`);
+      tempBot.unshift(`L ${xScale(i)} ${mapY(d.low, minTemp, maxTemp, t1.top, t1.bot)}`);
+    });
+    svg.appendChild(el("path", {
+      d: `${tempTop.join(" ")} ${tempBot.join(" ")} Z`,
+      fill: "rgba(226, 91, 54, 0.32)",
+      stroke: "#E25B36",
+      "stroke-width": "1.2"
+    }));
+
+    // Track 2A: Cook Inlet Tide Envelope (--accent-blue: #3A7CA5)
+    const tideTop = [], tideBot = [];
+    let started = false;
+    data.forEach((d, i) => {
+      if (d.highTide === null || d.lowTide === null) return;
+      tideTop.push(`${!started ? "M" : "L"} ${xScale(i)} ${mapY(d.highTide, minTide, maxTide, t2.top, t2.bot)}`);
+      tideBot.unshift(`L ${xScale(i)} ${mapY(d.lowTide, minTide, maxTide, t2.top, t2.bot)}`);
+      started = true;
+    });
+    if (started) {
+      svg.appendChild(el("path", {
+        d: `${tideTop.join(" ")} ${tideBot.join(" ")} Z`,
+        fill: "rgba(58, 124, 165, 0.25)",
+        stroke: "#3A7CA5",
+        "stroke-width": "1.2"
+      }));
+    }
+
+    // Track 2B: Moon Illumination % Curve
+    const moonPts = data
+      .filter((d) => !isNaN(d.illum))
+      .map((d) => `${xScale(data.indexOf(d))},${mapY(d.illum, 0, 100, t2.top, t2.bot)}`)
+      .join(" ");
+    svg.appendChild(el("polyline", {
+      points: moonPts,
+      fill: "none",
+      stroke: "#76736E",
+      "stroke-width": "1.5",
+      "stroke-dasharray": "4 2"
+    }));
+
+    // Track Headers
+    const addLabel = (y, text) => {
+      const t = el("text", {
+        x: padL + 4, y,
+        "font-family": "JetBrains Mono, monospace", "font-size": "9",
+        "font-weight": "600", fill: "#76736E"
+      });
+      t.textContent = text;
+      svg.appendChild(t);
+    };
+    addLabel(t1.top + 10, "SOLAR & TEMP (Amber: Daylight • Terracotta: High/Low °F)");
+    addLabel(t2.top + 10, "LUNAR & TIDES (Blue: Tide Swing ft • Dashed: Moon Illumination %)");
+
+    // Track 3: Sky Condition Barcode
+    const barW = plotW / data.length;
+    data.forEach((d, i) => {
+      let color = "#D8D3C8"; // Overcast / Fog
+      if (/clear/i.test(d.cond)) color = "#F0B35B";
+      else if (/snow|drizzle|rain/i.test(d.cond)) color = "#3A7CA5";
+      svg.appendChild(el("rect", {
+        x: xScale(i) - barW / 2,
+        y: t3.top,
+        width: Math.max(barW - 1, 2),
+        height: t3.bot - t3.top,
+        fill: color
+      }));
+    });
+
+    // Interactive Crosshair & Table Row Sync
+    const cursorLine = el("line", {
+      x1: -10, x2: -10, y1: 8, y2: 258,
+      stroke: "#111111", "stroke-width": "1"
+    });
+    svg.appendChild(cursorLine);
+
+    let activeRow = null;
+    svg.onmousemove = (e) => {
+      const rect = svg.getBoundingClientRect();
+      const svgX = ((e.clientX - rect.left) / rect.width) * W;
+      const idx = Math.max(0, Math.min(data.length - 1, Math.round(((svgX - padL) / plotW) * (data.length - 1))));
+      const d = data[idx];
+      const cx = xScale(idx);
+
+      cursorLine.setAttribute("x1", cx);
+      cursorLine.setAttribute("x2", cx);
+
+      const tideStr = d.highTide !== null
+        ? `Tide: ${d.highTide}/${d.lowTide}ft (${(d.highTide - d.lowTide).toFixed(1)}ft)`
+        : "Tide: --";
+      readout.textContent = `${d.date} • ${d.high}°/${d.low}°F (${d.cond}) • Daylight: ${d.dlText} • Moon: ${d.illum}% • ${tideStr}`;
+
+      if (activeRow) activeRow.style.backgroundColor = "";
+      d.tr.style.backgroundColor = "rgba(226, 91, 54, 0.14)";
+      activeRow = d.tr;
+    };
+
+    svg.onclick = () => {
+      if (activeRow) {
+        activeRow.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    };
+  }
+
+  // Watch #archive-body so it renders automatically as soon as data.json populates the table
+  const observer = new MutationObserver(() => renderVisualizer());
+  observer.observe(tbody, { childList: true });
+
+  // Also run once immediately in case rows are already present
+  renderVisualizer();
+})();
 </body>
 </html>
