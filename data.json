@@ -1019,6 +1019,22 @@
     "low_tide": "-0.6 ft"
   },
   {
+    "timestamp": "2026-11-24T00:14:56.020730+00:00",
+    "date": "2026-11-12",
+    "high": "35\u00b0",
+    "low": "28\u00b0",
+    "condition": "Overcast",
+    "weather_code": 3,
+    "sunrise": "8:58 AM",
+    "sunset": "4:28 PM",
+    "daylight": "7h 29m",
+    "sun_peak": "10.4\u00b0",
+    "moon_phase": "Waxing Crescent",
+    "moon_illumination": "7% illuminated",
+    "high_tide": "28.5 ft",
+    "low_tide": "0.0 ft"
+  },
+  {
     "timestamp": "2026-11-13T22:22:46.646187+00:00",
     "date": "2026-11-13",
     "high": "31\u00b0",
@@ -1035,6 +1051,22 @@
     "low_tide": "0.7 ft"
   },
   {
+    "timestamp": "2026-11-24T00:14:56.115440+00:00",
+    "date": "2026-11-14",
+    "high": "28\u00b0",
+    "low": "20\u00b0",
+    "condition": "Slight snow",
+    "weather_code": 71,
+    "sunrise": "9:04 AM",
+    "sunset": "4:23 PM",
+    "daylight": "7h 19m",
+    "sun_peak": "9.9\u00b0",
+    "moon_phase": "Waxing Crescent",
+    "moon_illumination": "21% illuminated",
+    "high_tide": "26.9 ft",
+    "low_tide": "1.5 ft"
+  },
+  {
     "timestamp": "2026-11-15T21:28:00.945895+00:00",
     "date": "2026-11-15",
     "high": "28\u00b0",
@@ -1049,6 +1081,22 @@
     "moon_illumination": "30% illuminated",
     "high_tide": "26.4 ft",
     "low_tide": "2.3 ft"
+  },
+  {
+    "timestamp": "2026-11-24T00:14:56.221112+00:00",
+    "date": "2026-11-16",
+    "high": "30\u00b0",
+    "low": "25\u00b0",
+    "condition": "Heavy snow",
+    "weather_code": 75,
+    "sunrise": "9:09 AM",
+    "sunset": "4:18 PM",
+    "daylight": "7h 9m",
+    "sun_peak": "9.4\u00b0",
+    "moon_phase": "Waxing Crescent",
+    "moon_illumination": "40% illuminated",
+    "high_tide": "26.0 ft",
+    "low_tide": "3.2 ft"
   },
   {
     "timestamp": "2026-11-17T23:43:42.899932+00:00",
@@ -1147,7 +1195,7 @@
     "low_tide": "5.3 ft"
   },
   {
-    "timestamp": "2026-11-24T00:05:22.972931+00:00",
+    "timestamp": "2026-11-24T00:15:11.743721+00:00",
     "date": "2026-11-23",
     "high": "21\u00b0",
     "low": "14\u00b0",
