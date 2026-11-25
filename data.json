@@ -1225,5 +1225,21 @@
     "moon_illumination": "100% illuminated",
     "high_tide": "32.3 ft",
     "low_tide": "-2.1 ft"
+  },
+  {
+    "timestamp": "2026-11-25T20:22:22.594799+00:00",
+    "date": "2026-11-25",
+    "high": "20\u00b0",
+    "low": "11\u00b0",
+    "condition": "Fog",
+    "weather_code": 45,
+    "sunrise": "9:32 AM",
+    "sunset": "4:00 PM",
+    "daylight": "6h 28m",
+    "sun_peak": "7.6\u00b0",
+    "moon_phase": "Full Moon",
+    "moon_illumination": "100% illuminated",
+    "high_tide": "32.6 ft",
+    "low_tide": "-2.7 ft"
   }
 ]
